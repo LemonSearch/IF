@@ -1,3 +1,7 @@
+from huggingface_hub import login
+login()
+
+
 from deepfloyd_if.modules import IFStageI, IFStageII, StableStageIII
 from deepfloyd_if.modules.t5 import T5Embedder
 from deepfloyd_if.pipelines import dream
