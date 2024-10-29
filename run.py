@@ -4,8 +4,8 @@ from deepfloyd_if.pipelines import dream
 
 # loading the models
 device = 'cuda:0'
-if_I = IFStageI('IF-I-XL-v1.0', device=device)
-if_II = IFStageII('IF-II-L-v1.0', device=device)
+if_I = IFStageI('IF-I-M-v1.0', device=device)
+if_II = IFStageII('IF-II-M-v1.0', device=device)
 if_III = StableStageIII('stable-diffusion-x4-upscaler', device=device)
 t5 = T5Embedder(device="cpu")
 
