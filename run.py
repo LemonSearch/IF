@@ -34,6 +34,7 @@ result = dream(
         "noise_level": 20,
         "sample_timestep_respacing": "75",
     },
+    disable_watermark=True,
 )
 
-if_III.show(result['III'], size=14, disable_watermark=True)
+if_III.show(result['III'], size=14)
