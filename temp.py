@@ -1,7 +1,21 @@
 from deepfloyd_if.modules.t5 import T5Embedder
 from transformers import AutoTokenizer
+from huggingface_hub import hf_hub_download
+import os
 
-tokenizer_path = 't5-v1_1-xxl'
+dir_or_name = 't5-v1_1-xxl'
+cache_dir=None
+hf_token= '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'
+cache_dir = os.path.join(cache_dir, dir_or_name)
+
+for filename in [
+    'config.json', 'special_tokens_map.json', 'spiece.model', 'tokenizer_config.json',
+    'pytorch_model.bin.index.json', 'pytorch_model-00001-of-00002.bin', 'pytorch_model-00002-of-00002.bin'
+]:
+    hf_hub_download(repo_id=f'DeepFloyd/{dir_or_name}', filename=filename, cache_dir=cache_dir,
+                    force_filename=filename, token=hf_token)
+    
+tokenizer_path = cache_dir
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 
 texts = 'photo of a cat'
