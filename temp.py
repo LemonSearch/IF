@@ -35,3 +35,19 @@ print("Keys in text_tokens_and_mask:", text_tokens_and_mask.keys())
 
 # 查看变量的类型
 print("Type of text_tokens_and_mask:", type(text_tokens_and_mask))
+
+# 查看内容
+print("tokens:")
+print(text_tokens_and_mask['input_ids'])
+
+# 查看对应关系
+words_to_tokens = []
+
+#BatchEncoding.word_ids returns a list mapping words to tokens
+for w_idx in set(text_tokens_and_mask.word_ids()):
+    #BatchEncoding.word_to_tokens tells us which and how many tokens are used for the specific word
+    start, end = text_tokens_and_mask.word_to_tokens(w_idx)
+    words_to_tokens.append(list(range(start,end)))
+
+print("words:", texts)
+print("words to tokens:", words_to_tokens)
