@@ -4,7 +4,7 @@ from huggingface_hub import hf_hub_download
 import os
 
 dir_or_name = 't5-v1_1-xxl'
-cache_dir=None
+cache_dir = os.path.expanduser('~/.cache/IF_')
 hf_token= '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'
 cache_dir = os.path.join(cache_dir, dir_or_name)
 
