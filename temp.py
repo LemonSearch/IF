@@ -45,6 +45,9 @@ words_to_tokens = []
 
 #BatchEncoding.word_ids returns a list mapping words to tokens
 for w_idx in set(text_tokens_and_mask.word_ids()):
+    if w_idx==None:
+        continue
+
     #BatchEncoding.word_to_tokens tells us which and how many tokens are used for the specific word
     start, end = text_tokens_and_mask.word_to_tokens(w_idx)
     words_to_tokens.append(list(range(start,end)))
