@@ -29,7 +29,7 @@ def save_each_step_image(step_idx, sample):
     # 生成文件名
     filename = os.path.join(save_dir, f"step_{step_idx}.png")
     # 保存图像
-    torchvision.utils.save_image(sample['sample'], filename)
+    torchvision.utils.save_image(sample['sample'][0], filename)     # 这里的0其实是[:count]，同时有几个prompt输入就前几个是图像
     return sample  # 返回 sample，不影响后续处理
 
 result = dream(
