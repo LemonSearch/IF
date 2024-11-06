@@ -32,6 +32,10 @@ def save_each_step_image(step_idx, sample):
     torchvision.utils.save_image(sample['sample'][0], filename)     # 这里的0其实是[:count]，同时有几个prompt输入就前几个是图像
     return sample  # 返回 sample，不影响后续处理
 
+# 定义 draw_att_map 函数
+def draw_att_map(weight):
+    print("Weight shape:", weight.shape)
+
 result = dream(
     t5=t5, if_I=if_I, if_II=if_II, if_III=if_III,
     prompt=[prompt]*count,
@@ -40,6 +44,7 @@ result = dream(
         "guidance_scale": 7.0,
         "sample_timestep_respacing": "smart100",
         "sample_fn": save_each_step_image,
+        "att_weight_fn": draw_att_map, 
     },
     if_II_kwargs={
         "guidance_scale": 4.0,

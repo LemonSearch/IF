@@ -35,12 +35,12 @@ class TimestepEmbedSequential(nn.Sequential, TimestepBlock):
     support it as an extra input.
     """
 
-    def forward(self, x, emb, encoder_out=None):
+    def forward(self, x, emb, encoder_out=None, att_weight_fn=None):
         for layer in self:
             if isinstance(layer, TimestepBlock):
                 x = layer(x, emb)
             elif isinstance(layer, AttentionBlock):
-                x = layer(x, encoder_out)
+                x = layer(x, encoder_out, att_weight_fn)
             else:
                 x = layer(x)
         return x
@@ -262,7 +262,7 @@ class AttentionBlock(nn.Module):
             self.norm_encoder = normalization(encoder_channels, dtype=self.dtype)
         self.proj_out = zero_module(conv_nd(1, channels, channels, 1, dtype=self.dtype))
 
-    def forward(self, x, encoder_out=None):
+    def forward(self, x, encoder_out=None, att_weight_fn=None):
         b, c, *spatial = x.shape
         qkv = self.qkv(self.norm(x).view(b, c, -1))
         if encoder_out is not None:
@@ -270,7 +270,7 @@ class AttentionBlock(nn.Module):
             encoder_out = self.norm_encoder(encoder_out)
             # # #
             encoder_out = self.encoder_kv(encoder_out)
-            h = self.attention(qkv, encoder_out)
+            h = self.attention(qkv, encoder_out, att_weight_fn)
         else:
             h = self.attention(qkv)
         h = self.proj_out(h)
@@ -287,7 +287,7 @@ class QKVAttention(nn.Module):
         self.n_heads = n_heads
         self.disable_self_attention = disable_self_attention
 
-    def forward(self, qkv, encoder_kv=None):
+    def forward(self, qkv, encoder_kv=None, att_weight_fn=None):
         """
         Apply QKV attention.
         :param qkv: an [N x (H * 3 * C) x T] tensor of Qs, Ks, and Vs.
@@ -320,6 +320,11 @@ class QKVAttention(nn.Module):
             )  # More stable with f16 than dividing afterwards
             weight = torch.softmax(weight.float(), dim=-1).type(weight.dtype)
             a = torch.einsum('bts,bcs->bct', weight, v)
+
+            if att_weight_fn is not None:
+                weight_copy = weight.detach().clone()
+                att_weight_fn(weight_copy)
+
         return a.reshape(bs, -1, length)
 
 
@@ -625,7 +630,7 @@ class UNetModel(nn.Module):
 
         self.cache = None
 
-    def forward(self, x, timesteps, text_emb, timestep_text_emb=None, aug_emb=None, use_cache=False, **kwargs):
+    def forward(self, x, timesteps, text_emb, timestep_text_emb=None, aug_emb=None, use_cache=False, att_weight_fn=None, **kwargs):
         hs = []
         emb = self.time_embed(timestep_embedding(timesteps, self.model_channels, dtype=self.dtype))
 
@@ -653,9 +658,13 @@ class UNetModel(nn.Module):
             h = module(h, emb, encoder_out)
             hs.append(h)
         h = self.middle_block(h, emb, encoder_out)
-        for module in self.output_blocks:
+        for idx, module in enumerate(self.output_blocks):
+            print(idx)      # test
             h = torch.cat([h, hs.pop()], dim=1)
-            h = module(h, emb, encoder_out)
+            if idx == len(self.output_blocks) - 1:
+                h = module(h, emb, encoder_out, att_weight_fn)       # draw the attention map at the last layer of the UNet
+            else:     
+                h = module(h, emb, encoder_out)
         h = h.type(self.dtype)
         h = self.out(h)
         return h

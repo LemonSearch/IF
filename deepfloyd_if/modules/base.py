@@ -90,6 +90,7 @@ class IFBaseModule:
         support_noise=None,
         support_noise_less_qsample_steps=0,
         inpainting_mask=None,
+        att_weight_fn=None, 
         **kwargs,
     ):
         self._clear_cache()
@@ -101,7 +102,7 @@ class IFBaseModule:
         def model_fn(x_t, ts, **kwargs):
             half = x_t[: len(x_t) // bs_scale]
             combined = torch.cat([half]*bs_scale, dim=0)
-            model_out = self.model(combined, ts, **kwargs)
+            model_out = self.model(combined, ts, att_weight_fn, **kwargs)
             eps, rest = model_out[:, :3], model_out[:, 3:]
             if bs_scale == 3:
                 cond_eps, pos_cond_eps, uncond_eps = torch.split(eps, len(eps) // bs_scale, dim=0)
