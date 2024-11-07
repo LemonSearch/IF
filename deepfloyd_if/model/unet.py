@@ -654,6 +654,12 @@ class UNetModel(nn.Module):
 
         emb = self.activation_layer(emb)
 
+        # find the index of the last module with attention block
+        last_att_idx = None
+        for idx, module in enumerate(self.output_blocks):
+            if any(isinstance(layer, AttentionBlock) for layer in module):
+                last_att_idx = idx
+
         h = x.type(self.dtype)
         for module in self.input_blocks:
             h = module(h, emb, encoder_out)
@@ -661,9 +667,7 @@ class UNetModel(nn.Module):
         h = self.middle_block(h, emb, encoder_out)
         for idx, module in enumerate(self.output_blocks):
             h = torch.cat([h, hs.pop()], dim=1)
-            if idx == len(self.output_blocks) - 1:
-                if att_weight_fn is None:
-                    print("fun not in Unet!")
+            if last_att_idx is not None and idx == last_att_idx:
                 h = module(h, emb, encoder_out, att_weight_fn)       # draw the attention map at the last layer of the UNet
             else:     
                 h = module(h, emb, encoder_out)

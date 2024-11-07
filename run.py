@@ -30,7 +30,9 @@ def save_each_step_image(step_idx, sample):
 
 # 定义 draw_att_map 函数
 def draw_att_map(weight):
+    print("--------------")
     print("Weight shape:", weight.shape)
+    print("--------------")
 
 result = dream(
     t5=t5, if_I=if_I, if_II=if_II, if_III=if_III,
