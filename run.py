@@ -1,7 +1,3 @@
-# from huggingface_hub import login
-# login()
-
-
 from deepfloyd_if.modules import IFStageI, IFStageII, StableStageIII
 from deepfloyd_if.modules.t5 import T5Embedder
 from deepfloyd_if.pipelines import dream
@@ -16,7 +12,7 @@ if_III = StableStageIII('stable-diffusion-x4-upscaler', device=device)
 t5 = T5Embedder(device="cpu")
 
 # set the prompts
-prompt = 'ultra close-up color photo portrait of domestic cat with huge nose in the kitchen'
+prompt = 'ultra close-up color photo portrait of angry orange domestic cat'
 count = 1   # use the same prompt to generate <how many> images
 
 # save middle steps in output dir
@@ -43,7 +39,7 @@ result = dream(
     if_I_kwargs={
         "guidance_scale": 7.0,
         "sample_timestep_respacing": "smart100",
-        "sample_fn": save_each_step_image,
+        # "sample_fn": save_each_step_image,
         "att_weight_fn": draw_att_map, 
     },
     if_II_kwargs={

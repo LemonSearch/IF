@@ -102,7 +102,7 @@ class IFBaseModule:
         def model_fn(x_t, ts, **kwargs):
             half = x_t[: len(x_t) // bs_scale]
             combined = torch.cat([half]*bs_scale, dim=0)
-            model_out = self.model(combined, ts, att_weight_fn, **kwargs)
+            model_out = self.model(combined, ts, **kwargs)
             eps, rest = model_out[:, :3], model_out[:, 3:]
             if bs_scale == 3:
                 cond_eps, pos_cond_eps, uncond_eps = torch.split(eps, len(eps) // bs_scale, dim=0)
@@ -167,6 +167,7 @@ class IFBaseModule:
             text_emb=torch.cat(list_text_emb, dim=0).to(self.device, dtype=self.model.dtype),
             timestep_text_emb=timestep_text_emb,
             use_cache=True,
+            att_weight_fn=att_weight_fn
         )
         if low_res is not None:
             if blur_sigma is not None:

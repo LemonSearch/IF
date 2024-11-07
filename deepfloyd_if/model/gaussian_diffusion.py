@@ -263,6 +263,11 @@ class GaussianDiffusion:
         if model_kwargs is None:
             model_kwargs = {}
 
+        if 'att_weight_fn' in model_kwargs:
+            print("key exist!")
+            if model_kwargs['att_weight_fn'] is not None:
+                print("fun in model kwargs is not None!")
+
         B, C = x.shape[:2]
         assert t.shape == (B,)
         model_output = model(x, self._scale_timesteps(t), **model_kwargs)
@@ -432,6 +437,11 @@ class GaussianDiffusion:
         :param progress: if True, show a tqdm progress bar.
         :return: a non-differentiable batch of samples.
         """
+        if 'att_weight_fn' in model_kwargs:
+            print("p_sample_loop key exist!")
+            if model_kwargs['att_weight_fn'] is not None:
+                print("p_sample_loop fun in model kwargs is not None!")
+
         final = None
         for step_idx, sample in enumerate(self.p_sample_loop_progressive(
             model,

@@ -322,6 +322,7 @@ class QKVAttention(nn.Module):
             a = torch.einsum('bts,bcs->bct', weight, v)
 
             if att_weight_fn is not None:
+                print("att_weight_fn is not None!")
                 weight_copy = weight.detach().clone()
                 att_weight_fn(weight_copy)
 
@@ -659,9 +660,10 @@ class UNetModel(nn.Module):
             hs.append(h)
         h = self.middle_block(h, emb, encoder_out)
         for idx, module in enumerate(self.output_blocks):
-            print(idx)      # test
             h = torch.cat([h, hs.pop()], dim=1)
             if idx == len(self.output_blocks) - 1:
+                if att_weight_fn is None:
+                    print("fun not in Unet!")
                 h = module(h, emb, encoder_out, att_weight_fn)       # draw the attention map at the last layer of the UNet
             else:     
                 h = module(h, emb, encoder_out)
