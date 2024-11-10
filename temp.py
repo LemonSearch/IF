@@ -18,7 +18,7 @@ for filename in [
 tokenizer_path = cache_dir
 tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 
-texts = 'photo of a cat'
+texts = 'ultra close-up color photo portrait of angry orange domestic cat'
 
 text_tokens_and_mask = tokenizer(
     texts,

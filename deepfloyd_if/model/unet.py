@@ -322,7 +322,6 @@ class QKVAttention(nn.Module):
             a = torch.einsum('bts,bcs->bct', weight, v)
 
             if att_weight_fn is not None:
-                print("att_weight_fn is not None!")
                 weight_copy = weight.detach().clone()
                 att_weight_fn(weight_copy)
 
